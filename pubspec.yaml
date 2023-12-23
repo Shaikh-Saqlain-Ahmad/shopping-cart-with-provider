@@ -22,3 +22,12 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/apple.jpg
+    - assets/banana.jpg
+    - assets/cherry.jpg
+    - assets/mango.jpg
+    - assets/orange.jpg
+    - assets/peach.jpg
+    - assets/grape.jpg
+
