@@ -4,6 +4,7 @@ import 'package:shopping_cart_with_provider/constants/constant.dart';
 import 'package:shopping_cart_with_provider/constants/db-helper.dart';
 import 'package:shopping_cart_with_provider/models/cart-model.dart';
 import 'package:shopping_cart_with_provider/provider/cart-provider.dart';
+import 'package:shopping_cart_with_provider/ui/cart-screen.dart';
 
 class ShoppingList extends StatefulWidget {
   const ShoppingList({super.key});
@@ -37,7 +38,15 @@ class _ShoppingListState extends State<ShoppingList> {
             Container(
               child: Consumer<CartProvider>(
                 builder: (context, value, child) {
-                  return Badge(child: Text(value.getCounter().toString()));
+                  return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CartScreen(),
+                            ));
+                      },
+                      child: Badge(child: Text(value.getCounter().toString())));
                 },
               ),
             ),
