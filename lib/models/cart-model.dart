@@ -22,7 +22,7 @@ class Cart {
         ProductId = res['ProductId'],
         ProductName = res['ProductName'],
         inPrice = res['inPrice'],
-        ProductPrice = res['ProdcutPrice'],
+        ProductPrice = res['ProductPrice'],
         quantity = res['quantity'],
         unitTag = res['unitTag'],
         image = res['image'];

@@ -11,7 +11,8 @@ class DbHelper {
     if (_db != null) {
       return _db!;
     }
-    _db = await initDatabase(); //initialize database
+    _db = await initDatabase();
+    return _db; //initialize database
   }
 
   initDatabase() async {
@@ -24,7 +25,7 @@ class DbHelper {
 
   _onCreate(Database db, int version) async {
     await db.execute(
-        'CREATE TABLE cart (id INTEGER PRIMARY KEY , productId VARCHAR UNIQUE,productName TEXT,initialPrice INTEGER, productPrice INTEGER , quantity INTEGER, unitTag TEXT , image TEXT )');
+        'CREATE TABLE cart (id INTEGER PRIMARY KEY , productId VARCHAR UNIQUE,productName TEXT,inPrice INTEGER, productPrice INTEGER , quantity INTEGER, unitTag TEXT , image TEXT )');
   }
 
   Future<Cart> insert(Cart cart) async {
