@@ -14,7 +14,10 @@ class _ShoppingListState extends State<ShoppingList> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Shopping List"),
+          title: const Text(
+            "Shopping List",
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
           centerTitle: true,
           flexibleSpace: Container(
             decoration: BoxDecoration(
