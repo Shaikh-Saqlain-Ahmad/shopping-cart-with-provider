@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shopping_cart_with_provider/constants/db-helper.dart';
 import 'package:shopping_cart_with_provider/models/cart-model.dart';
 import 'package:shopping_cart_with_provider/provider/cart-provider.dart';
 import 'package:shopping_cart_with_provider/ui/reusable-widget.dart';
@@ -14,31 +15,51 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  DbHelper dbHelper = DbHelper();
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartProvider>(context);
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "My Products",
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [primary, secondary])),
-        ),
-        backgroundColor: Colors.transparent,
-      ),
+          title: const Text(
+            "My Products",
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [primary, secondary])),
+          ),
+          backgroundColor: Colors.transparent,
+          actions: [
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CartScreen(),
+                    ));
+              },
+              child: Consumer<CartProvider>(
+                builder: (context, value, child) {
+                  return Badge(child: Text(value.getCounter().toString()));
+                },
+              ),
+            ),
+            const SizedBox(
+              width: 20,
+            )
+          ]),
       body: Column(children: [
         FutureBuilder(
             future: cart.getData(),
             builder: (context, AsyncSnapshot<List<Cart>> snapshot) {
               if (snapshot.hasData) {
+                debugPrint("snapshot data ${snapshot.data.toString()}");
                 return Expanded(
                     child: ListView.builder(
                         itemCount: snapshot.data!.length,
@@ -66,8 +87,28 @@ class _CartScreenState extends State<CartScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(snapshot.data![index].ProductName
-                                            .toString()),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(snapshot
+                                                .data![index].ProductName
+                                                .toString()),
+                                            InkWell(
+                                                onTap: () {
+                                                  dbHelper.deleteItem(snapshot
+                                                      .data![index].id!);
+                                                  cart.removeCounter();
+                                                  cart.removeTotalPrice(
+                                                      double.parse(snapshot
+                                                          .data![index]
+                                                          .ProductPrice
+                                                          .toString()));
+                                                },
+                                                child: const Icon(
+                                                    Icons.delete_rounded))
+                                          ],
+                                        ),
                                         Text(snapshot.data![index].unitTag
                                                 .toString() +
                                             snapshot.data![index].ProductPrice
@@ -87,8 +128,121 @@ class _CartScreenState extends State<CartScreen> {
                                                   color: button,
                                                   borderRadius:
                                                       BorderRadius.circular(5)),
-                                              child: const Center(
-                                                  child: Text("Add to Cart")),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      int quantity = snapshot
+                                                          .data![index]
+                                                          .quantity!;
+                                                      int price = snapshot
+                                                          .data![index]
+                                                          .ProductPrice!;
+                                                      quantity--;
+                                                      int? newPrice =
+                                                          price * quantity;
+                                                      if (quantity > 0) {
+                                                        dbHelper
+                                                            .updateQuantity(
+                                                                Cart(
+                                                          id: snapshot
+                                                              .data![index].id,
+                                                          ProductId: snapshot
+                                                              .data![index]
+                                                              .ProductId,
+                                                          ProductName: snapshot
+                                                              .data![index]
+                                                              .ProductName,
+                                                          inPrice: snapshot
+                                                              .data![index]
+                                                              .inPrice,
+                                                          ProductPrice:
+                                                              newPrice,
+                                                          quantity: quantity,
+                                                          unitTag: snapshot
+                                                              .data![index]
+                                                              .unitTag,
+                                                          image: snapshot
+                                                              .data![index]
+                                                              .image,
+                                                        ))
+                                                            .then((value) {
+                                                          newPrice = 0;
+                                                          quantity = 0;
+                                                          cart.removeTotalPrice(
+                                                              double.parse(snapshot
+                                                                  .data![index]
+                                                                  .inPrice!
+                                                                  .toString()));
+                                                        }).onError((error,
+                                                                stackTrace) {
+                                                          debugPrint(
+                                                              "error updating cart ${error.toString()}");
+                                                        });
+                                                      }
+                                                    },
+                                                    child: const Icon(
+                                                        Icons.remove_circle),
+                                                  ),
+                                                  Text(snapshot
+                                                      .data![index].quantity
+                                                      .toString()),
+                                                  InkWell(
+                                                      onTap: () {
+                                                        int quantity = snapshot
+                                                            .data![index]
+                                                            .quantity!;
+                                                        int price = snapshot
+                                                            .data![index]
+                                                            .ProductPrice!;
+                                                        quantity++;
+                                                        int? newPrice =
+                                                            price * quantity;
+                                                        dbHelper
+                                                            .updateQuantity(
+                                                                Cart(
+                                                          id: snapshot
+                                                              .data![index].id,
+                                                          ProductId: snapshot
+                                                              .data![index]
+                                                              .ProductId,
+                                                          ProductName: snapshot
+                                                              .data![index]
+                                                              .ProductName,
+                                                          inPrice: snapshot
+                                                              .data![index]
+                                                              .inPrice,
+                                                          ProductPrice:
+                                                              newPrice,
+                                                          quantity: quantity,
+                                                          unitTag: snapshot
+                                                              .data![index]
+                                                              .unitTag,
+                                                          image: snapshot
+                                                              .data![index]
+                                                              .image,
+                                                        ))
+                                                            .then((value) {
+                                                          newPrice = 0;
+                                                          quantity = 0;
+                                                          cart.addTotalPrice(
+                                                              double.parse(snapshot
+                                                                  .data![index]
+                                                                  .inPrice!
+                                                                  .toString()));
+                                                        }).onError((error,
+                                                                stackTrace) {
+                                                          debugPrint(
+                                                              "error updating cart ${error.toString()}");
+                                                        });
+                                                      },
+                                                      child: const Icon(
+                                                          Icons.add_circle))
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         )
@@ -101,16 +255,21 @@ class _CartScreenState extends State<CartScreen> {
                           );
                         }));
               } else {
-                return Text("");
+                return const Text("");
               }
             }),
         Consumer<CartProvider>(builder: (context, value, child) {
-          return Column(
-            children: [
-              ReusableWidget(
-                  title: 'Sub-Total',
-                  value: r'$' + value.getTotalPrice().toStringAsFixed(2))
-            ],
+          return Visibility(
+            visible: value.getTotalPrice().toStringAsFixed(2) == '0.00'
+                ? false
+                : true,
+            child: Column(
+              children: [
+                ReusableWidget(
+                    title: 'Sub-Total',
+                    value: r'$' + value.getTotalPrice().toStringAsFixed(2))
+              ],
+            ),
           );
         })
       ]),

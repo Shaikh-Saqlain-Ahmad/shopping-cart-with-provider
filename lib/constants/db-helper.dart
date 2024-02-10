@@ -24,8 +24,15 @@ class DbHelper {
   }
 
   _onCreate(Database db, int version) async {
-    await db.execute(
-        'CREATE TABLE cart (id INTEGER PRIMARY KEY , productId VARCHAR UNIQUE,productName TEXT,inPrice INTEGER, productPrice INTEGER , quantity INTEGER, unitTag TEXT , image TEXT )');
+    await db.execute('CREATE TABLE cart ('
+        'id INTEGER PRIMARY KEY, '
+        'productId VARCHAR UNIQUE, '
+        'ProductName TEXT, '
+        'inPrice INTEGER, '
+        'ProductPrice INTEGER, '
+        'quantity INTEGER, '
+        'unitTag TEXT, '
+        'image TEXT)');
   }
 
   Future<Cart> insert(Cart cart) async {
@@ -35,9 +42,20 @@ class DbHelper {
   }
 
   Future<List<Cart>> getCartList() async {
-    var dbClient = await db;
+    var dbClient = await db; //referencing our database
     final List<Map<String, Object?>> queryResult =
         await dbClient!.query('cart');
     return queryResult.map((e) => Cart.fromMap(e)).toList();
+  }
+
+  Future<int> deleteItem(int id) async {
+    var dbClient = await db;
+    return await dbClient!.delete('cart', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateQuantity(Cart cart) async {
+    var dbClient = await db;
+    return await dbClient!
+        .update('cart', cart.toMap(), where: 'id = ?', whereArgs: [cart.id]);
   }
 }
