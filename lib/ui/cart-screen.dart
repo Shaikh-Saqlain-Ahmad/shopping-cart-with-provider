@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shopping_cart_with_provider/models/cart-model.dart';
 import 'package:shopping_cart_with_provider/provider/cart-provider.dart';
+import 'package:shopping_cart_with_provider/ui/reusable-widget.dart';
 
 import '../constants/constant.dart';
 
@@ -32,18 +33,6 @@ class _CartScreenState extends State<CartScreen> {
                   colors: [primary, secondary])),
         ),
         backgroundColor: Colors.transparent,
-        actions: [
-          Container(
-            child: Consumer<CartProvider>(
-              builder: (context, value, child) {
-                return Badge(child: Text(value.getCounter().toString()));
-              },
-            ),
-          ),
-          const SizedBox(
-            width: 20,
-          )
-        ],
       ),
       body: Column(children: [
         FutureBuilder(
@@ -114,7 +103,16 @@ class _CartScreenState extends State<CartScreen> {
               } else {
                 return Text("");
               }
-            })
+            }),
+        Consumer<CartProvider>(builder: (context, value, child) {
+          return Column(
+            children: [
+              ReusableWidget(
+                  title: 'Sub-Total',
+                  value: r'$' + value.getTotalPrice().toStringAsFixed(2))
+            ],
+          );
+        })
       ]),
     ));
   }

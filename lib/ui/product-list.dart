@@ -35,18 +35,17 @@ class _ShoppingListState extends State<ShoppingList> {
           ),
           backgroundColor: Colors.transparent,
           actions: [
-            Container(
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CartScreen(),
+                    ));
+              },
               child: Consumer<CartProvider>(
                 builder: (context, value, child) {
-                  return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CartScreen(),
-                            ));
-                      },
-                      child: Badge(child: Text(value.getCounter().toString())));
+                  return Badge(child: Text(value.getCounter().toString()));
                 },
               ),
             ),
